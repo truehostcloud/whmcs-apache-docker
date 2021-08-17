@@ -45,9 +45,6 @@ COPY ./entrypoint.sh /
 
 # RUN chmod -R 777 /var/www/cloud
 
-ADD cronfile /etc/cron.d/whmcs
-RUN chmod 0644 /etc/cron.d/whmcs
-RUN touch /var/log/cron.log
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["sh", "entrypoint.sh"]
 EXPOSE 443

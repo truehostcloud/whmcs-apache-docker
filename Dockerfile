@@ -41,11 +41,3 @@ COPY ioncube_loader_lin_7.3.so /usr/local/lib/php/extensions/no-debug-non-zts-20
 
 RUN a2enmod rewrite
 RUN a2enmod ssl
-COPY ./entrypoint.sh /
-
-# RUN chmod -R 777 /var/www/cloud
-
-RUN chmod +x ./entrypoint.sh
-ENTRYPOINT ["sh", "entrypoint.sh"]
-EXPOSE 443
-EXPOSE 80

@@ -1,43 +1,53 @@
-FROM php:7.3.22-apache
+FROM php:7.4-apache
 
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+          curl \
+          libmemcached-dev \
+          libz-dev \
+          libpq-dev \
+          libjpeg-dev \
+          libpng-dev \
+          libfreetype6-dev \
+          libmcrypt-dev; \
+  rm -rf /var/lib/apt/lists/*
+
+# Install additional PHP Packages and WHMCS Requirements
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install mysqli
-RUN apt-get update -y  \
-        && apt-get install -y libpng-dev
-RUN apt-get install -y zlib1g-dev
-RUN apt-get install -y libzip-dev
-RUN apt-get install -y libxml2-dev
-RUN apt-get install -y nano
-RUN apt-get install -y git
-RUN apt-get install -y libjpeg-dev
-RUN apt-get install -y libwebp-dev libjpeg62-turbo-dev libpng-dev libxpm-dev libfreetype6-dev
-RUN apt-get install -y cron
-RUN apt-get install -y libldap2-dev
+
 RUN docker-php-ext-configure gd \
-        --with-freetype-dir=/usr/lib/ \
-        --with-png-dir=/usr/lib/ \
-        --with-jpeg-dir=/usr/lib/ \
-        --with-gd
-RUN docker-php-ext-install gd
-RUN docker-php-ext-install zip
-RUN docker-php-ext-install soap
-RUN docker-php-ext-install xml
-RUN docker-php-ext-install bcmath
-RUN docker-php-ext-install intl
+  --prefix=/usr \
+  --with-jpeg \
+  --with-webp \
+  --with-freetype; \
+  docker-php-ext-install gd; \
+  php -r 'var_dump(gd_info());'
+
+RUN apt-get update -yqq && \
+    apt-get install -y zlib1g-dev libicu-dev g++ && \
+    docker-php-ext-configure intl && \
+    docker-php-ext-install intl
+
 RUN docker-php-ext-install opcache
-RUN apt-get update  \
-        && apt-get install -y libc-client-dev libkrb5-dev  \
-        && rm -r /var/lib/apt/lists/*
-RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl  \
-        && docker-php-ext-install imap
-RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/
-RUN docker-php-ext-install ldap
+COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-COPY ioncube_loader_lin_7.3.so /usr/local/lib/php/extensions/no-debug-non-zts-20180731/ioncube_loader_lin_7.3.so
+RUN rm /etc/apt/preferences.d/no-debian-php && \
+    apt-get -y install libxml2-dev php-soap && \
+    docker-php-ext-install soap;
 
-#RUN rm -f /opt/docker/etc/httpd/ssl/server.crt && rm -f /opt/docker/etc/httpd/ssl/server.key
+# Install the php ioncube loader
+# Essential part to run WHMCS
+RUN cd /tmp \
+    && curl -o ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar zxpf ioncube.tar.gz \
+    && mv ioncube/ioncube_loader_lin_7.4.so /usr/local/lib/php/extensions/* \
+    && rm -Rf ioncube.tar.gz ioncube \
+    && echo "zend_extension=ioncube_loader_lin_7.4.so" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini \
+    && rm -rf /tmp/ioncube*
 
-#COPY server.crt server.key /opt/docker/etc/httpd/ssl/
-
-RUN a2enmod rewrite
-RUN a2enmod ssl
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm /var/log/lastlog /var/log/faillog \

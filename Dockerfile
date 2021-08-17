@@ -4,6 +4,9 @@ RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
           curl \
+          wget \
+          nano \
+          vim \
           libmemcached-dev \
           libz-dev \
           libpq-dev \

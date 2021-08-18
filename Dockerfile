@@ -36,6 +36,9 @@ RUN apt-get update -yqq && \
 RUN docker-php-ext-install opcache
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
+RUN pecl install memcached
+RUN echo extension=memcached.so >> /usr/local/etc/php/conf.d/memcached.ini
+
 RUN rm /etc/apt/preferences.d/no-debian-php && \
     apt-get -y install libxml2-dev php-soap && \
     docker-php-ext-install soap;

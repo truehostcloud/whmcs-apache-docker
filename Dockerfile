@@ -7,6 +7,7 @@ RUN set -eux; \
           wget \
           nano \
           vim \
+          cron \
           libmemcached-dev \
           libz-dev \
           libpq-dev \

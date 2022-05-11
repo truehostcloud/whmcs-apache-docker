@@ -8,6 +8,8 @@ RUN set -eux; \
           nano \
           vim \
           cron \
+          zip \
+          libzip-dev \
           libmemcached-dev \
           libz-dev \
           libpq-dev \
@@ -20,6 +22,10 @@ RUN set -eux; \
 # Install additional PHP Packages and WHMCS Requirements
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install mysqli
+
+# For Domain Reseller
+RUN docker-php-ext-install calendar \
+  && docker-php-ext-install zip \
 
 RUN docker-php-ext-configure gd \
   --prefix=/usr \

@@ -25,9 +25,9 @@ RUN docker-php-ext-install mysqli
 
 # For Domain Reseller
 RUN docker-php-ext-install calendar \
-  && docker-php-ext-install zip \
+  && docker-php-ext-install zip
 
-  RUN docker-php-ext-configure gd \
+RUN docker-php-ext-configure gd \
   --prefix=/usr \
   --with-jpeg \
   --with-webp \
@@ -63,4 +63,4 @@ RUN cd /tmp \
 # Clean up
 RUN apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-  rm /var/log/lastlog /var/log/faillog \
+  rm /var/log/lastlog /var/log/faillog

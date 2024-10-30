@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.1.29-apache
 
 RUN set -eux; \
   apt-get update; \
@@ -52,13 +52,8 @@ RUN rm /etc/apt/preferences.d/no-debian-php && \
 
 # Install the php ioncube loader
 # Essential part to run WHMCS
-RUN cd /tmp \
-  && curl -o ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
-  && tar zxpf ioncube.tar.gz \
-  && mv ioncube/ioncube_loader_lin_8.1.so /usr/local/lib/php/extensions/* \
-  && rm -Rf ioncube.tar.gz ioncube \
-  && echo "zend_extension=ioncube_loader_lin_8.1.so" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini \
-  && rm -rf /tmp/ioncube*
+COPY ioncube_loader_lin_8.1.so /usr/local/lib/php/extensions/no-debug-non-zts-20210902/ioncube_loader_lin_8.1.so
+RUN echo "zend_extension=ioncube_loader_lin_8.1.so" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini
 
 # Clean up
 RUN apt-get clean && \

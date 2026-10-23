@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - upgrade/whmcs-8.13.7
   workflow_dispatch: {}
 
 concurrency:
@@ -26,14 +25,6 @@ jobs:
           echo "tag=$tag" >> $GITHUB_OUTPUT
           echo "previous=$previous" >> $GITHUB_OUTPUT
 
-          ref="${GITHUB_REF#refs/heads/}"
-          if [ "$ref" = "main" ]; then
-            suffix="prod"
-          else
-            suffix="upgrade"
-          fi
-          echo "suffix=$suffix" >> $GITHUB_OUTPUT
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -48,6 +39,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: truehostcloud/whmcs-apache-docker:${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.suffix }}
-          cache-from: type=registry,ref=truehostcloud/whmcs-apache-docker:latest-${{ steps.vars.outputs.suffix }}-buildcache
-          cache-to: type=registry,ref=truehostcloud/whmcs-apache-docker:latest-${{ steps.vars.outputs.suffix }}-buildcache,mode=max
+          tags: truehostcloud/whmcs-apache-docker:${{ steps.vars.outputs.tag }}-prod
+          cache-from: type=registry,ref=truehostcloud/whmcs-apache-docker:latest-main-buildcache
+          cache-to: type=registry,ref=truehostcloud/whmcs-apache-docker:latest-main-buildcache,mode=max

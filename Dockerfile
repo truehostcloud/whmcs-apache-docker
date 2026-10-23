@@ -1,6 +1,6 @@
-FROM php:8.1-fpm AS fpm
+FROM php:8.2-fpm AS fpm
 
-FROM php:8.1-apache
+FROM php:8.2-apache
 
 RUN set -eux; \
   apt-get update; \
@@ -42,8 +42,8 @@ RUN pecl install memcached redis \
 
 COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-COPY ioncube_loader_lin_8.1.so /usr/local/lib/php/extensions/no-debug-non-zts-20210902/
-RUN echo zend_extension=ioncube_loader_lin_8.1.so > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini
+COPY ioncube_loader_lin_8.2.so /usr/local/lib/php/extensions/no-debug-non-zts-20220829/
+RUN echo zend_extension=ioncube_loader_lin_8.2.so > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini
 
 COPY --from=fpm /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
 COPY php-fpm.conf /usr/local/etc/php-fpm.conf
